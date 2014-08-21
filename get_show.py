@@ -50,8 +50,8 @@ def get_show_cmd(command, ip, user, password):
 
 
 def main():
-    # TODO: Set up Argparse to take in IP address as a script prompt.
-    
+    # TODO: Set up Argparse to take in IP address as a script argument.
+
     """
     Modify these please
     """
