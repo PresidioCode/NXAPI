@@ -14,6 +14,12 @@ from getpass import getpass
 from ipaddress import ip_address
 
 class nxosDevice():
+    '''
+    This is a class to encapsulate the information needed to connect to
+    an NXOS device via NXAPI.  The object is instantiated with an IP
+    address and has setter methods to set credentials.  This class also
+    leverages the "py2-ipaddress" module to verify valid IP address inputs.  
+    '''
     _username = None
     _password = None
     _IP = None
