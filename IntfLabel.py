@@ -4,6 +4,8 @@
 # This script polls the device for the needed information and:
 # 1) Labels interfaces based on CDP information.
 # 2) Labels port-channels based on member port CDP information
+#
+# TO DO in a future version:
 # 3) Labels ports and port-channels connected to Fabric Extenders  
 #
 
