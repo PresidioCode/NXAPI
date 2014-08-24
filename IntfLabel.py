@@ -10,7 +10,7 @@
 #
 
 from argparse import ArgumentParser
-from nxapi_core import nxosDevice, short_int, short_name, show_cmd, conf_t
+from nxapi_base import NXOS, short_int, short_name
 
 
 def makeDescriptions(cdp, pc):
@@ -39,14 +39,14 @@ def makeDescriptions(cdp, pc):
 
 
 def main(args):
-    n9k = nxosDevice(args.mgmt_ip)
-    n9k.getCredentials()
+    n9k = NXOS(args.mgmt_ip)
+    n9k.PromptCreds()
     print "Gathering data."
-    cdp_data = show_cmd('show cdp neighbor detail', n9k)
-    pc_data = show_cmd('show port-channel summary', n9k)
+    cdp_data = n9k.cli_show('show cdp neighbor detail')
+    pc_data = n9k.cli_show('show port-channel summary')
     desc_cmds = makeDescriptions(cdp_data, pc_data)
-    if conf_t(desc_cmds, n9k):
-        print "Descriptions Complete."
+    n9k.cli_conf(desc_cmds)
+    print "Descriptions Complete."
 
 
 if __name__ == '__main__':
