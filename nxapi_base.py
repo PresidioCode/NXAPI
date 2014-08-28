@@ -7,7 +7,6 @@
 #
 #
 
-import sys
 import requests
 import json
 from getpass import getpass
@@ -53,14 +52,16 @@ class NXOS():
     def ip(self, value):
         self._ip = ip_address(value)
     
+
     def PromptCreds(self):
-        print "Please supply credentials for device: {}".format(self.__repr__())
+        print "Please supply credentials for device: {}".format(str(self))
         user = raw_input('Username: ')
         if len(user) > 0:
             self.username = user
         else:
             self.username = None
         self.PromptPassword()
+
 
     def PromptPassword(self):
         value = getpass('Password: ')
@@ -69,12 +70,8 @@ class NXOS():
         else:
             self.password = None
 
-    def cli_show(self, command):
-        '''
-        This function makes the NXAPI call to retieve the output for the supplied
-        command, using the supplied IP address and supplied credentials.  It returns
-        the body of the response as long as a "success" code is returned.
-        '''
+
+    def cli_show_raw(self, command):
         url='http://' + self.ip + '/ins'
         myheaders={'content-type':'application/json'}
         payload={
@@ -93,13 +90,23 @@ class NXOS():
         try:
             response = requests.post(url,data=json.dumps(payload), headers=myheaders,
                 auth=(self.username, self.password), timeout=10).json()
+            return response
         except ValueError:
             raise ValueError("Did not receive proper JSON response. Check credentials.")
-        status = response['ins_api']['outputs']['output']
+
+
+    def cli_show(self, command):
+        '''
+        This function makes the NXAPI call to retieve the output for the supplied
+        command, using the supplied IP address and supplied credentials.  It returns
+        the body of the response as long as a "success" code is returned.
+        '''
+        raw = self.cli_show_raw(command)
+        status = raw['ins_api']['outputs']['output']
         if status['code'] == '200':
-            return response['ins_api']['outputs']['output']['body']
+            return status['body']
         else:
-            raise ValueError(status['msg'])
+            raise ValueError(status)
 
 
     def cli_conf(self, command_list):
@@ -137,11 +144,21 @@ class NXOS():
             for item in resp_codes:
                 if item["code"] != '200':
                     raise ValueError("{}, Input: {}".format(item['msg'], command))
-
-
         #TODO:  Return result codes in a list for all commands entered.  Will require
         #       breaking apart commands separated by ";" and associating them with the
         #       proper result code.
+
+
+    def cli_show_save_txt(self, command, filename):
+        '''
+        This function makes the NXAPI call to retieve the output for the supplied
+        command, using the supplied IP address and supplied credentials.  It saves
+        the body of the response in a formatted and human readable way.  The
+        output is saved to the supplied filename.
+        '''
+        raw = self.cli_show_raw(command)
+        with open(filename, 'wb') as output:
+            output.write(json.dumps(raw, indent=2, separators=(',', ': ')))
 
 
 def short_int(str):
