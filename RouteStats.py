@@ -3,10 +3,9 @@
 # 
 # This script polls the device for the route table and outputs
 # some routing statistics, such as:
-# 1) How many interfaces are on the device
-# 2) List the unique next-hops are in the route-table, and how many
-#    routes point to each.
-# 3) 
+# 1) A list of interfaces on the device and associated IP
+# 2) List of next-hops per interface and a count of routes of each 
+#    protocol. 
 #
 
 from argparse import ArgumentParser
@@ -16,6 +15,17 @@ from requests import Timeout
 
 
 def GetRouteStats(routetable, vrf="default", addrf="ipv4"):
+    '''
+    This function takes the route-table data structure via NXAPI and returns a
+    new data structure that stores route stats on a per-interface basis.
+    
+    For each interface it returns:
+    *  The IP of the interface (local route)
+    *  The network route for the interface (direct route)
+    *  FHRP interface IP (hspr, vrrp, glbp route)
+    *  Each next-hop address out that interface (if any exist).  For each next-hop:
+        * A count of routes for each routing protocol that uses that next-hop.
+    '''
     # TODO:  Need to update to handle multiple VRFs and address families
     nh_stats = {}
     connected_types = ['direct', 'local', 'hsrp', 'vrrp', 'glbp']
@@ -23,7 +33,7 @@ def GetRouteStats(routetable, vrf="default", addrf="ipv4"):
     current_addrf = current_vrf['TABLE_addrf']['ROW_addrf']
     routes = current_addrf['TABLE_prefix']['ROW_prefix']
     for prefix in routes:
-        # TODO: Multiple subnets on interface will overwrite previous
+        # TODO: FIX: Secondary IPs on interface will overwrite previous entry
         nexthop_list = prefix['TABLE_path']['ROW_path']
         if type(nexthop_list) == dict:      #Only one next-hop
             nexthop_list = [nexthop_list]
@@ -54,6 +64,10 @@ def GetRouteStats(routetable, vrf="default", addrf="ipv4"):
 
 
 def PrintRouteStats(stats):
+    '''
+    This fucntion takes the route statistics from the GetRouteStats() function
+    and prints them to the screen with some formatting.
+    '''
     print ('-'*30)
     for intf in sorted(stats.keys()):
         print "{} (IP: {}, Net: {}):".format(intf, stats[intf]['local'], 
@@ -61,7 +75,7 @@ def PrintRouteStats(stats):
         if 'hops' in stats[intf].keys():
             for hop in stats[intf]['hops']:
                 for client in stats[intf]['hops'][hop]:
-                    print " " * 4 + "Nexthop: {}\tNum Routes: {} ({})".format(str(hop), 
+                    print " " * 4 + "Nexthop: {}\tRoutes: {} ({})".format(str(hop), 
                         stats[intf]['hops'][hop][client], client)
 
 
