@@ -28,7 +28,7 @@ def GetRouteStats(routetable, vrf="default", addrf="ipv4"):
     '''
     # TODO:  Need to update to handle multiple VRFs and address families
     nh_stats = {}
-    connected_types = ['direct', 'local', 'hsrp', 'vrrp', 'glbp']
+    connected_types = ['direct', 'local', 'hsrp', 'vrrp_engine']
     current_vrf = routetable['TABLE_vrf']['ROW_vrf']
     current_addrf = current_vrf['TABLE_addrf']['ROW_addrf']
     routes = current_addrf['TABLE_prefix']['ROW_prefix']
@@ -70,7 +70,15 @@ def PrintRouteStats(stats):
     '''
     print ('-'*30)
     for intf in sorted(stats.keys()):
-        print "{} (IP: {}, Net: {}):".format(intf, stats[intf]['local'], 
+        keys = stats[intf].keys()
+        if 'hsrp' in keys:
+            print "{} (IP: {}, Net: {} , HSRP: {}):".format(intf, stats[intf]['local'], 
+                stats[intf]['direct'], str(stats[intf]['hsrp']))
+        elif 'vrrp_engine' in keys:
+            print "{} (IP: {}, Net: {} , VRRP: {}):".format(intf, stats[intf]['local'], 
+                stats[intf]['direct'], str(stats[intf]['vrrp_engine']))
+        else:       
+            print "{} (IP: {}, Net: {}):".format(intf, stats[intf]['local'], 
             stats[intf]['direct'])
         if 'hops' in stats[intf].keys():
             for hop in stats[intf]['hops']:
