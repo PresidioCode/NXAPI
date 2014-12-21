@@ -161,7 +161,7 @@ class NXOS():
             output.write(json.dumps(raw, indent=2, separators=(',', ': ')))
 
 
-def short_int(str):
+def short_intf(str):
   ''' 
   This function shortens the interface name for easier reading 
   '''

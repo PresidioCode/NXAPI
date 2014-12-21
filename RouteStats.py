@@ -22,7 +22,7 @@ def GetRouteStats(routetable, vrf="default", addrf="ipv4"):
     For each interface it returns:
     *  The IP of the interface (local route)
     *  The network route for the interface (direct route)
-    *  FHRP interface IP (hspr, vrrp, glbp route)
+    *  FHRP interface IP (hsrp, vrrp, glbp route)
     *  Each next-hop address out that interface (if any exist).  For each next-hop:
         * A count of routes for each routing protocol that uses that next-hop.
     '''
@@ -65,7 +65,7 @@ def GetRouteStats(routetable, vrf="default", addrf="ipv4"):
 
 def PrintRouteStats(stats):
     '''
-    This fucntion takes the route statistics from the GetRouteStats() function
+    This function takes the route statistics from the GetRouteStats() function
     and prints them to the screen with some formatting.
     '''
     print ('-'*30)

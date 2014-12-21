@@ -10,7 +10,7 @@
 #
 
 from argparse import ArgumentParser
-from nxapi_base import NXOS, short_int, short_name
+from nxapi_base import NXOS, short_intf, short_name
 
 
 def makeDescriptions(cdp, pc):
@@ -21,7 +21,7 @@ def makeDescriptions(cdp, pc):
     desc_list = []
     for neighbor in neighbor_list:
         desc_list.append('int {} ;description {}:{}'.format(neighbor["intf_id"], 
-            short_name(neighbor["device_id"]), short_int(neighbor["port_id"])))
+            short_name(neighbor["device_id"]), short_intf(neighbor["port_id"])))
     for group in pc_list:
         interface = group["port-channel"]
         remote = None
