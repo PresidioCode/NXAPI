@@ -20,10 +20,10 @@ class NXOS():
     leverages the "py2-ipaddress" module to verify valid IP address inputs.  
     '''
 
-    def __init__(self, IP):
-        self._ip = ip_address(IP)
-        self._username = None
-        self._password = None
+    def __init__(self, IP = None):
+        self.ip = IP
+        self.username = None
+        self.password = None
 
     def __repr__(self):
         return "NXOS Device @ " + self.ip
@@ -47,11 +47,14 @@ class NXOS():
 
     @property
     def ip(self):
-        return self._ip.exploded
+        return self._ip
     @ip.setter
     def ip(self, value):
-        self._ip = ip_address(value)
-    
+        if isinstance(value, unicode):
+            self._ip = ip_address(ip)
+        else:
+            self._ip = ip_address(unicode(ip))
+
 
     def PromptCreds(self):
         print "Please supply credentials for device: {}".format(str(self))
